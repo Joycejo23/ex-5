@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS Timer Quiz</title>
+    <link rel="stylesheet" href="quiz.css">
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="header">
+            <h1>Quick Quiz</h1>
+            <div id="timer-box"> <span id="timer">10</span>s</div>
+        </div>
+        <div id="warning-msg"></div>
+        <form id="quiz-form">
+            <div class="question">
+                <p>1. What does JS stand for?</p>
+                <label><input type="radio" name="q1" value="a"> JavaSource</label>
+                <label><input type="radio" name="q1" value="b"> JavaScript</label>
+            </div>
+            <div class="question">
+                <p>2. 2 + 2 = ?</p>
+                <label><input type="radio" name="q2" value="a"> 4</label>
+                <label><input type="radio" name="q2" value="b"> 22</label>
+            </div>
+            <div class="question">
+                <p>3. Which keyword declares a constant?</p>
+                <label><input type="radio" name="q3" value="a"> let</label>
+                <label><input type="radio" name="q3" value="b"> const</label>
+            </div>
+            <div class="question">
+                <p>4. Symbol for strict equality?</p>
+                <label><input type="radio" name="q4" value="a"> ==</label>
+                <label><input type="radio" name="q4" value="b"> ===</label>
+            </div>
+            <div class="question">
+                <p>5. Inside which HTML element do we put JS?</p>
+                <label><input type="radio" name="q5" value="a"> &lt;script&gt;</label>
+                <label><input type="radio" name="q5" value="b"> &lt;js&gt;</label>
+            </div>
+            <button type="submit" id="submit-btn">Finish Quiz</button>
+        </form>
+
+        <div id="result-card" class="hidden">
+            <h2 id="score-display"></h2>
+            <button onclick="location.reload()">Try Again</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+:root {
+    --primary: #6e8efb;
+    --secondary: #a777e3;
+    --bg: #0f172a;
+}
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    color: white;
+}
+.quiz-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+#timer-box {
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: rgba(0,0,0,0.2);
+    padding: 5px 15px;
+    border-radius: 50px;
+}
+.question {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+}
+label {
+    display: block;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+label:hover {
+    background: rgba(255,255,255,0.1);
+}
+#warning-msg {
+    text-align: center;
+    font-weight: bold;
+    height: 20px;
+    margin-bottom: 10px;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: white;
+    color: var(--primary);
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s;
+}
+button:hover { transform: scale(1.02); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.hidden { display: none; }
+let timeLeft = 10; 
+const correctAnswers = {
+    q1: "b",
+    q2: "a",
+    q3: "b",
+    q4: "b",
+    q5: "a"
+};
+
+const timerElement = document.getElementById("timer");
+const warningElement = document.getElementById("warning-msg");
+const quizForm = document.getElementById("quiz-form");
+const submitBtn = document.getElementById("submit-btn");
+const resultCard = document.getElementById("result-card");
+
+const countdown = setInterval(() => {
+    timeLeft--;
+    timerElement.textContent = timeLeft;
+
+    if (timeLeft === 5) {
+        warningElement.textContent = "Only 5 seconds remaining!";
+        warningElement.style.color = "#ff4757";
+    }
+
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        submitQuiz();
+    }
+}, 1000);
+
+function submitQuiz(event) {
+    if (event) event.preventDefault();
+    clearInterval(countdown);
+    let score = 0;
+    const formData = new FormData(quizForm);
+
+    for (let i = 1; i <= 5; i++) {
+        const userAnswer = formData.get(`q${i}`);
+        if (userAnswer === correctAnswers[`q${i}`]) {
+            score++;
+        }
+    }
+    displayResults(score);
+    disableOptions();
+}
+
+function disableOptions() {
+    const inputs = quizForm.querySelectorAll("input");
+    inputs.forEach(input => input.disabled = true);
+    submitBtn.disabled = true;
+    submitBtn.style.display = "none";
+}
+
+function displayResults(score) {
+    const totalQuestions = Object.keys(correctAnswers).length;
+    const scoreDisplay = document.getElementById("score-display");
+    scoreDisplay.textContent = `Final Score: ${score} / ${totalQuestions}`;
+    resultCard.classList.remove("hidden");
+    warningElement.textContent = "Quiz Completed!";
+    warningElement.style.color = "#2ed573";
+}
+
+quizForm.addEventListener("submit", submitQuiz);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Countdown Timer</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(120deg, #020617, #0b1d3a);
+            color: white;
+            text-align: center;
+            padding-top: 80px;
+        }
+        .container {
+            background: #111827;
+            padding: 30px;
+            border-radius: 12px;
+            width: 350px;
+            margin: auto;
+            box-shadow: 0 0 20px rgba(56,189,248,0.3);
+        }
+        h2 { color: #38bdf8; }
+        .timer { font-size: 22px; margin-top: 20px; }
+        .box { display: inline-block; margin: 10px; }
+        .box span { display: block; font-size: 28px; font-weight: bold; }
+        .label { font-size: 12px; color: #c7d2fe; }
+        .closed { color: red; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Event Registration Countdown</h2>
+        <div class="timer">
+            <div class="box"><span id="days">0</span><div class="label">Days</div></div>
+            <div class="box"><span id="hours">0</span><div class="label">Hours</div></div>
+            <div class="box"><span id="minutes">0</span><div class="label">Minutes</div></div>
+            <div class="box"><span id="seconds">0</span><div class="label">Seconds</div></div>
+        </div>
+        <p id="message" class="closed"></p>
+    </div>
+
+    <script>
+        const eventDate = new Date(2026, 2, 25, 23, 59, 59).getTime();
+
+        const timer = setInterval(function () {
+            const now = new Date().getTime();
+            const diff = eventDate - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours;
+            document.getElementById("minutes").innerText = minutes;
+            document.getElementById("seconds").innerText = seconds;
+
+            if (diff < 0) {
+                clearInterval(timer);
+                document.querySelectorAll(".box span").forEach(el => el.innerText = 0);
+                document.getElementById("message").innerText = "Registration Closed";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
